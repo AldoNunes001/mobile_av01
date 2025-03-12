@@ -9,7 +9,6 @@ const CATEGORIES = [
   'Shoes',
   'Accessories',
   'Electronics',
-  'Home',
 ];
 
 const PRODUCTS = [
@@ -93,6 +92,7 @@ export default function Home() {
       </ScrollView>
 
       <ScrollView
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.products}
       >
@@ -125,8 +125,10 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: '#fff',
+    paddingBottom: 40, // Added padding to avoid overlap with the tab bar
+    marginBottom: 40
   },
   header: {
     padding: 24,
@@ -143,26 +145,43 @@ const styles = StyleSheet.create({
   },
   categories: {
     paddingHorizontal: 20,
-    gap: 8,
+    gap: 4,
+    marginBottom: 0, // Changed from 8 to 0
   },
   categoryButton: {
-    paddingHorizontal: 20,
     paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 20,
     backgroundColor: '#f5f5f5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40, // Altura fixa para todos os botões
   },
   categoryButtonActive: {
     backgroundColor: '#1a1a1a',
+    height: 40, // Mesma altura do botão inativo
+    // Mantenha o restante do estilo para destaque
+  },
+  categoryTextActive: {
+    color: '#fff',
+    fontWeight: 'bold',
+    // Remova o lineHeight para evitar inconsistências
   },
   categoryText: {
     fontSize: 14,
     color: '#666',
+    // textAlign: 'center',
   },
-  categoryTextActive: {
-    color: '#fff',
-  },
+//   categoryTextActive: {
+//   color: '#fff',
+//   fontWeight: 'bold',
+//   textAlign: 'center',
+//   lineHeight: 16, // Garante que o texto não estique o botão
+// },
   products: {
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingTop: 16,  // Reduced from 24
+    paddingBottom: 24,
     gap: 24,
   },
   productCard: {

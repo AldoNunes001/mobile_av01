@@ -56,8 +56,8 @@ export default function Profile() {
             <User size={32} color="#666" />
           </View>
           <View>
-            <Text style={styles.userName}>John Doe</Text>
-            <Text style={styles.userEmail}>john.doe@example.com</Text>
+            <Text style={styles.userName}>Zé da Silva</Text>
+            <Text style={styles.userEmail}>zedasilva@example.com</Text>
           </View>
         </View>
 
