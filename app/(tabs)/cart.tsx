@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Minus, Plus, Trash2 } from 'lucide-react-native';
 
@@ -50,51 +57,52 @@ export default function Cart() {
   const shipping = 10;
   const total = subtotal + shipping;
 
+  const renderItem = ({ item }: { item: CartItem }) => (
+    <View style={styles.cartItem}>
+      <Image source={{ uri: item.image }} style={styles.itemImage} />
+      <View style={styles.itemInfo}>
+        <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.itemPrice}>${item.price}</Text>
+        <View style={styles.quantityControls}>
+          <TouchableOpacity
+            style={styles.quantityButton}
+            onPress={() => updateQuantity(item.id, -1)}
+          >
+            <Minus size={16} color="#666" />
+          </TouchableOpacity>
+          <Text style={styles.quantity}>{item.quantity}</Text>
+          <TouchableOpacity
+            style={styles.quantityButton}
+            onPress={() => updateQuantity(item.id, 1)}
+          >
+            <Plus size={16} color="#666" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.removeButton}
+            onPress={() => removeItem(item.id)}
+          >
+            <Trash2 size={16} color="#dc2626" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Shopping Cart</Text>
-        <Text style={styles. subtitle}>{cartItems.length} items</Text>
+        <Text style={styles.subtitle}>{cartItems.length} items</Text>
       </View>
 
-      <ScrollView
+      <FlatList
+        data={cartItems}
+        keyExtractor={item => item.id.toString()}
+        renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.cartItems}
-      >
-        {cartItems.map(item => (
-          <View key={item.id} style={styles.cartItem}>
-            <Image
-              source={{ uri: item.image }}
-              style={styles.itemImage}
-            />
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemName}>{item.name}</Text>
-              <Text style={styles.itemPrice}>${item.price}</Text>
-              <View style={styles.quantityControls}>
-                <TouchableOpacity
-                  style={styles.quantityButton}
-                  onPress={() => updateQuantity(item.id, -1)}
-                >
-                  <Minus size={16} color="#666" />
-                </TouchableOpacity>
-                <Text style={styles.quantity}>{item.quantity}</Text>
-                <TouchableOpacity
-                  style={styles.quantityButton}
-                  onPress={() => updateQuantity(item.id, 1)}
-                >
-                  <Plus size={16} color="#666" />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.removeButton}
-                  onPress={() => removeItem(item.id)}
-                >
-                  <Trash2 size={16} color="#dc2626" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
+        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+      />
 
       <View style={styles.summary}>
         <View style={styles.summaryRow}>
@@ -137,7 +145,7 @@ const styles = StyleSheet.create({
   },
   cartItems: {
     padding: 24,
-    gap: 16,
+    paddingBottom: 8,
   },
   cartItem: {
     flexDirection: 'row',
@@ -145,10 +153,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,

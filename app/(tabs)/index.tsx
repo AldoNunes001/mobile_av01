@@ -1,5 +1,13 @@
-import { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { useState, useMemo } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  ScrollView,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Heart } from 'lucide-react-native';
 
@@ -54,9 +62,33 @@ export default function Home() {
     );
   };
 
-  const filteredProducts = selectedCategory === 'All'
-    ? PRODUCTS
-    : PRODUCTS.filter(product => product.category === selectedCategory);
+  const filteredProducts = useMemo(
+    () =>
+      selectedCategory === 'All'
+        ? PRODUCTS
+        : PRODUCTS.filter(p => p.category === selectedCategory),
+    [selectedCategory]
+  );
+
+  const renderProduct = ({ item }) => (
+    <View style={styles.productCard}>
+      <Image source={{ uri: item.image }} style={styles.productImage} />
+      <TouchableOpacity
+        style={styles.favoriteButton}
+        onPress={() => toggleFavorite(item.id)}
+      >
+        <Heart
+          size={20}
+          color={favorites.includes(item.id) ? '#dc2626' : '#666'}
+          fill={favorites.includes(item.id) ? '#dc2626' : 'transparent'}
+        />
+      </TouchableOpacity>
+      <View style={styles.productInfo}>
+        <Text style={styles.productName}>{item.name}</Text>
+        <Text style={styles.productPrice}>${item.price}</Text>
+      </View>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -91,44 +123,23 @@ export default function Home() {
         ))}
       </ScrollView>
 
-      <ScrollView
-        style={{ flex: 1 }}
+      <FlatList
+        data={filteredProducts}
+        keyExtractor={item => item.id.toString()}
+        renderItem={renderProduct}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.products}
-      >
-        {filteredProducts.map(product => (
-          <View key={product.id} style={styles.productCard}>
-            <Image
-              source={{ uri: product.image }}
-              style={styles.productImage}
-            />
-            <TouchableOpacity
-              style={styles.favoriteButton}
-              onPress={() => toggleFavorite(product.id)}
-            >
-              <Heart
-                size={20}
-                color={favorites.includes(product.id) ? '#dc2626' : '#666'}
-                fill={favorites.includes(product.id) ? '#dc2626' : 'transparent'}
-              />
-            </TouchableOpacity>
-            <View style={styles.productInfo}>
-              <Text style={styles.productName}>{product.name}</Text>
-              <Text style={styles.productPrice}>${product.price}</Text>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
+        ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
     backgroundColor: '#fff',
-    paddingBottom: 40, // Added padding to avoid overlap with the tab bar
-    marginBottom: 40
+    paddingBottom: 40,
+    marginBottom: 40,
   },
   header: {
     padding: 24,
@@ -146,7 +157,7 @@ const styles = StyleSheet.create({
   categories: {
     paddingHorizontal: 20,
     gap: 4,
-    marginBottom: 0, // Changed from 8 to 0
+    marginBottom: 0,
   },
   categoryButton: {
     paddingVertical: 10,
@@ -155,43 +166,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 40, // Altura fixa para todos os botões
+    height: 40,
+    marginRight: 8,
   },
   categoryButtonActive: {
     backgroundColor: '#1a1a1a',
-    height: 40, // Mesma altura do botão inativo
-    // Mantenha o restante do estilo para destaque
-  },
-  categoryTextActive: {
-    color: '#fff',
-    fontWeight: 'bold',
-    // Remova o lineHeight para evitar inconsistências
   },
   categoryText: {
     fontSize: 14,
     color: '#666',
-    // textAlign: 'center',
   },
-//   categoryTextActive: {
-//   color: '#fff',
-//   fontWeight: 'bold',
-//   textAlign: 'center',
-//   lineHeight: 16, // Garante que o texto não estique o botão
-// },
+  categoryTextActive: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
   products: {
     paddingHorizontal: 24,
-    paddingTop: 16,  // Reduced from 24
+    paddingTop: 16,
     paddingBottom: 24,
-    gap: 24,
   },
   productCard: {
     borderRadius: 16,
     backgroundColor: '#fff',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
@@ -210,10 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 8,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,

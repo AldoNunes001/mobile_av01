@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, ScrollView, Image, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search as SearchIcon } from 'lucide-react-native';
 
@@ -42,6 +50,17 @@ export default function Search() {
     product.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const renderItem = ({ item }) => (
+    <TouchableOpacity style={styles.productCard}>
+      <Image source={{ uri: item.image }} style={styles.productImage} />
+      <View style={styles.productInfo}>
+        <Text style={styles.productName}>{item.name}</Text>
+        <Text style={styles.productCategory}>{item.category}</Text>
+        <Text style={styles.productPrice}>${item.price}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -57,24 +76,20 @@ export default function Search() {
         </View>
       </View>
 
-      <ScrollView
+      <FlatList
+        data={filteredProducts}
+        keyExtractor={item => item.id.toString()}
+        renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.results}
-      >
-        {filteredProducts.map(product => (
-          <TouchableOpacity key={product.id} style={styles.productCard}>
-            <Image
-              source={{ uri: product.image }}
-              style={styles.productImage}
-            />
-            <View style={styles.productInfo}>
-              <Text style={styles.productName}>{product.name}</Text>
-              <Text style={styles.productCategory}>{product.category}</Text>
-              <Text style={styles.productPrice}>${product.price}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+        ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+        ListEmptyComponent={
+          <Text style={{ textAlign: 'center', color: '#666' }}>
+            No results found.
+          </Text>
+        }
+        keyboardShouldPersistTaps="handled"
+      />
     </SafeAreaView>
   );
 }
@@ -111,7 +126,6 @@ const styles = StyleSheet.create({
   },
   results: {
     padding: 24,
-    gap: 16,
   },
   productCard: {
     flexDirection: 'row',
@@ -119,10 +133,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,

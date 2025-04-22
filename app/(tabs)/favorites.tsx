@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Heart, ShoppingBag } from 'lucide-react-native';
 
@@ -27,6 +34,28 @@ export default function Favorites() {
     setFavorites(prev => prev.filter(item => item.id !== id));
   };
 
+  const renderItem = ({ item }) => (
+    <View style={styles.productCard}>
+      <Image source={{ uri: item.image }} style={styles.productImage} />
+      <TouchableOpacity
+        style={styles.favoriteButton}
+        onPress={() => removeFromFavorites(item.id)}
+      >
+        <Heart size={20} color="#dc2626" fill="#dc2626" />
+      </TouchableOpacity>
+      <View style={styles.productInfo}>
+        <View>
+          <Text style={styles.productName}>{item.name}</Text>
+          <Text style={styles.productCategory}>{item.category}</Text>
+          <Text style={styles.productPrice}>${item.price}</Text>
+        </View>
+        <TouchableOpacity style={styles.addToCartButton}>
+          <ShoppingBag size={20} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -34,35 +63,19 @@ export default function Favorites() {
         <Text style={styles.subtitle}>{favorites.length} items</Text>
       </View>
 
-      <ScrollView
+      <FlatList
+        data={favorites}
+        keyExtractor={item => item.id.toString()}
+        renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.favorites}
-      >
-        {favorites.map(item => (
-          <View key={item.id} style={styles.productCard}>
-            <Image
-              source={{ uri: item.image }}
-              style={styles.productImage}
-            />
-            <TouchableOpacity
-              style={styles.favoriteButton}
-              onPress={() => removeFromFavorites(item.id)}
-            >
-              <Heart size={20} color="#dc2626" fill="#dc2626" />
-            </TouchableOpacity>
-            <View style={styles.productInfo}>
-              <View>
-                <Text style={styles.productName}>{item.name}</Text>
-                <Text style={styles.productCategory}>{item.category}</Text>
-                <Text style={styles.productPrice}>${item.price}</Text>
-              </View>
-              <TouchableOpacity style={styles.addToCartButton}>
-                <ShoppingBag size={20} color="#fff" />
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
-      </ScrollView>
+        ItemSeparatorComponent={() => <View style={{ height: 24 }} />}
+        ListEmptyComponent={
+          <Text style={{ textAlign: 'center', color: '#666' }}>
+            No favorites yet.
+          </Text>
+        }
+      />
     </SafeAreaView>
   );
 }
@@ -87,7 +100,6 @@ const styles = StyleSheet.create({
   },
   favorites: {
     padding: 24,
-    gap: 24,
   },
   productCard: {
     borderRadius: 16,
