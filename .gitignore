@@ -328,4 +328,6 @@ gradle-app.setting
 
 .bolt/
 
+firebaseConfig.ts
+
 # End of https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,reactnative
