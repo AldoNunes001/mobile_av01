@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,46 +9,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Minus, Plus, Trash2 } from 'lucide-react-native';
 import { router } from 'expo-router';
-
-type CartItem = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-};
+import { useCart, CartItem } from '@/context/CartContext';
 
 export default function Cart() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      name: 'Classic White Sneakers',
-      price: 89.99,
-      image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772',
-      quantity: 1,
-    },
-    {
-      id: 2,
-      name: 'Denim Jacket',
-      price: 129.99,
-      image: 'https://images.unsplash.com/photo-1601933973783-43cf8a7d4c5f',
-      quantity: 2,
-    },
-  ]);
-
-  const updateQuantity = (id: number, change: number) => {
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
-    );
-  };
-
-  const removeItem = (id: number) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
-  };
+  const { items: cartItems, updateQuantity, removeItem } = useCart();
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -60,27 +23,27 @@ export default function Cart() {
 
   const renderItem = ({ item }: { item: CartItem }) => (
     <View style={styles.cartItem}>
-      <Image source={{ uri: item.image }} style={styles.itemImage} />
+      <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />
       <View style={styles.itemInfo}>
         <Text style={styles.itemName}>{item.name}</Text>
         <Text style={styles.itemPrice}>${item.price}</Text>
         <View style={styles.quantityControls}>
           <TouchableOpacity
             style={styles.quantityButton}
-            onPress={() => updateQuantity(item.id, -1)}
+            onPress={() => updateQuantity(String(item.id), item.quantity - 1)}
           >
             <Minus size={16} color="#666" />
           </TouchableOpacity>
           <Text style={styles.quantity}>{item.quantity}</Text>
           <TouchableOpacity
             style={styles.quantityButton}
-            onPress={() => updateQuantity(item.id, 1)}
+            onPress={() => updateQuantity(String(item.id), item.quantity + 1)}
           >
             <Plus size={16} color="#666" />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.removeButton}
-            onPress={() => removeItem(item.id)}
+            onPress={() => removeItem(String(item.id))}
           >
             <Trash2 size={16} color="#dc2626" />
           </TouchableOpacity>

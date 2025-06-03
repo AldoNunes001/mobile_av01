@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
+import { CartProvider } from '@/context/CartContext';
 
 //IMPORTACAO FIREBASECONFIG
 import '@/firebaseConfig';
@@ -25,13 +26,14 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <>
+    <CartProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="checkout" options={{ headerShown: false }} />
+        <Stack.Screen name="product/[id]" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
-    </>
+    </CartProvider>
   );
 }
