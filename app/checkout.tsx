@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
-import BottomNavigation from '@/components/BottomNavigation';
+import BottomNavigation from '@/src/components/BottomNavigation';
 import { CreditCard, User, Calendar, Lock } from 'lucide-react-native';
 
 export default function Checkout() {

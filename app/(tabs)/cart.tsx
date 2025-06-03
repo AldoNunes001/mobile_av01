@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Minus, Plus, Trash2 } from 'lucide-react-native';
 import { router } from 'expo-router';
-import { useCart, CartItem } from '@/context/CartContext';
+import { useCart, CartItem } from '@/src/context/CartContext';
 
 export default function Cart() {
   const { items: cartItems, updateQuantity, removeItem } = useCart();

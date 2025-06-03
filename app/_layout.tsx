@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
-import { CartProvider } from '@/context/CartContext';
+import { CartProvider } from '@/src/context/CartContext';
 
 //IMPORTACAO FIREBASECONFIG
 import '@/firebaseConfig';

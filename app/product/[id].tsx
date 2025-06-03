@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'rea
 import { useLocalSearchParams, router } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/firebaseConfig';
-import { useCart } from '@/context/CartContext';
+import { useCart } from '@/src/context/CartContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 
