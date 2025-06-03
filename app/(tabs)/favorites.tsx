@@ -25,6 +25,13 @@ const FAVORITES = [
     image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314',
     category: 'Accessories',
   },
+  {
+    id: 5,
+    name: 'Thermocup',
+    price: 249.99,
+    image: 'https://i.ibb.co/SwRNcHSp/IMG-4118.jpg',
+    category: 'Accessories',
+  },
 ];
 
 export default function Favorites() {

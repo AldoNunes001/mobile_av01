@@ -41,6 +41,13 @@ const PRODUCTS = [
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
     category: 'Electronics',
   },
+  {
+    id: 5,
+    name: 'Thermocup',
+    price: 249.99,
+    image: 'https://i.ibb.co/SwRNcHSp/IMG-4118.jpg',
+    category: 'Accessories',
+  },
 ];
 
 export default function Search() {
