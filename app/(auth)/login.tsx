@@ -1,14 +1,24 @@
-import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { useState, useEffect } from 'react';
+import { 
+  StyleSheet, 
+  Text, 
+  View, 
+  TextInput, 
+  TouchableOpacity, 
+  Alert, 
+  ActivityIndicator,
+  ScrollView,
+  Keyboard
+} from 'react-native';
 import { Link, router } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Mail, Lock, ArrowRight } from 'lucide-react-native';
 
-// IMPORTACAO PARA LOGIN
+// Importações Firebase
 import { auth } from '@/firebaseConfig'; 
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -19,7 +29,24 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isFirebaseReady, setIsFirebaseReady] = useState(false);
   
+  // Verifica se o Firebase está pronto
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Força a inicialização do auth se necessário
+        await auth.authStateReady();
+        setIsFirebaseReady(true);
+      } catch (error) {
+          console.error('Firebase auth init error:', error);
+          setIsFirebaseReady(true); // Tenta mesmo com erro
+      }
+    };
+
+    checkAuth();
+  }, []);
+
   const { control, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -29,20 +56,56 @@ export default function Login() {
   });
 
   const onSubmit = async (data: LoginForm) => {
+    if (!isFirebaseReady) return;
+    
+    Keyboard.dismiss();
     setIsLoading(true);
+    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      router.replace('/(tabs)');
-    } catch (error) {
-      console.error(error);
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      router.replace('/'); // Navega para a área logada
+    } catch (error: any) {
+      let errorMessage = 'Invalid login. Please try again.';
+      
+      // Mensagens de erro mais específicas
+      switch (error.code) {
+        case 'auth/invalid-email':
+          errorMessage = 'Invalid email format';
+          break;
+        case 'auth/user-disabled':
+          errorMessage = 'This account has been disabled';
+          break;
+        case 'auth/user-not-found':
+          errorMessage = 'User not found';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Incorrect password';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Network error. Please check your connection';
+          break;
+      }
+      
+      Alert.alert('Login Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Se o Firebase ainda não está pronto, mostra um loader
+  if (!isFirebaseReady) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#1a1a1a" />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
+    <ScrollView 
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
       <View style={styles.header}>
         <Text style={styles.title}>Welcome back</Text>
         <Text style={styles.subtitle}>Sign in to your account</Text>
@@ -58,8 +121,10 @@ export default function Login() {
               <TextInput
                 style={styles.input}
                 placeholder="Email"
+                placeholderTextColor="#999"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                autoCorrect={false}
                 onChangeText={onChange}
                 value={value}
               />
@@ -79,7 +144,10 @@ export default function Login() {
               <TextInput
                 style={styles.input}
                 placeholder="Password"
+                placeholderTextColor="#999"
                 secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
                 onChangeText={onChange}
                 value={value}
               />
@@ -95,8 +163,14 @@ export default function Login() {
           onPress={handleSubmit(onSubmit)}
           disabled={isLoading}
         >
-          <Text style={styles.buttonText}>Sign In</Text>
-          <ArrowRight size={20} color="#fff" />
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <>
+              <Text style={styles.buttonText}>Sign In</Text>
+              <ArrowRight size={20} color="#fff" />
+            </>
+          )}
         </TouchableOpacity>
 
         <View style={styles.footer}>
@@ -106,14 +180,20 @@ export default function Login() {
           </Link>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 24,
+    backgroundColor: '#fff',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#fff',
   },
   header: {

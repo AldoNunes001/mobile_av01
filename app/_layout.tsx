@@ -6,8 +6,23 @@ import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 //IMPORTACAO FIREBASECONFIG
 import '@/firebaseConfig';
 
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/firebaseConfig';
+import { router } from 'expo-router';
+
 export default function RootLayout() {
   useFrameworkReady();
+
+  // ✅ Listener para manutenção de sessão
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.replace('/');
+      }
+    });
+
+    return unsubscribe;
+  }, []);
 
   return (
     <>

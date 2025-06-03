@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,48 +11,43 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Heart } from 'lucide-react-native';
 
-const CATEGORIES = [
-  'All',
-  'Clothing',
-  'Shoes',
-  'Accessories',
-  'Electronics',
-];
+// FIREBASE
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/firebaseConfig';
 
-const PRODUCTS = [
-  {
-    id: 1,
-    name: 'Classic White Sneakers',
-    price: 89.99,
-    image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772',
-    category: 'Shoes',
-  },
-  {
-    id: 2,
-    name: 'Denim Jacket',
-    price: 129.99,
-    image: 'https://images.unsplash.com/photo-1601933973783-43cf8a7d4c5f',
-    category: 'Clothing',
-  },
-  {
-    id: 3,
-    name: 'Leather Watch',
-    price: 199.99,
-    image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314',
-    category: 'Accessories',
-  },
-  {
-    id: 4,
-    name: 'Wireless Headphones',
-    price: 159.99,
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
-    category: 'Electronics',
-  },
-];
+const CATEGORIES = ['All', 'Clothing', 'Shoes', 'Accessories', 'Electronics'];
 
 export default function Home() {
+  const [products, setProducts] = useState<Array<any>>([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [favorites, setFavorites] = useState<number[]>([]);
+
+  const filteredProducts = useMemo(() =>
+    selectedCategory === 'All'
+      ? products
+      : products.filter(p => p.category === selectedCategory),
+      [selectedCategory, products]
+  );
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'products'));
+        const productsList = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            ...data,
+            id: data.id ?? doc.id,
+          };
+        });
+        setProducts(productsList);
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const toggleFavorite = (productId: number) => {
     setFavorites(prev =>
@@ -62,17 +57,9 @@ export default function Home() {
     );
   };
 
-  const filteredProducts = useMemo(
-    () =>
-      selectedCategory === 'All'
-        ? PRODUCTS
-        : PRODUCTS.filter(p => p.category === selectedCategory),
-    [selectedCategory]
-  );
-
   const renderProduct = ({ item }) => (
     <View style={styles.productCard}>
-      <Image source={{ uri: item.image }} style={styles.productImage} />
+      <Image source={{ uri: item.imageUrl }} style={styles.productImage} />
       <TouchableOpacity
         style={styles.favoriteButton}
         onPress={() => toggleFavorite(item.id)}

@@ -12,6 +12,10 @@ import {
   ChevronRight,
 } from 'lucide-react-native';
 
+// FIREBASE AUTHENTICATION
+import { signOut } from 'firebase/auth';
+import { auth } from '@/firebaseConfig';
+
 const MENU_ITEMS = [
   {
     icon: Package,
@@ -39,9 +43,13 @@ const MENU_ITEMS = [
   },
 ];
 
+const user = auth.currentUser;
+
+//FIREBASE AUTHENTICATION
 export default function Profile() {
-  const handleLogout = () => {
-    router.replace('/login');
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.replace('/(auth)/login'); 
   };
 
   return (
@@ -56,8 +64,8 @@ export default function Profile() {
             <User size={32} color="#666" />
           </View>
           <View>
-            <Text style={styles.userName}>Zé da Silva</Text>
-            <Text style={styles.userEmail}>zedasilva@example.com</Text>
+            <Text style={styles.userName}>{user?.displayName || 'Usuário'}</Text>
+            <Text style={styles.userEmail}>{user?.email}</Text>
           </View>
         </View>
 
