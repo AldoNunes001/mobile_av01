@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search as SearchIcon } from 'lucide-react-native';
+import { router } from 'expo-router';
 
 const PRODUCTS = [
   {
@@ -51,7 +52,12 @@ export default function Search() {
   );
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.productCard}>
+    <TouchableOpacity
+      style={styles.productCard}
+      onPress={() =>
+        router.push({ pathname: '/product/[id]', params: { id: item.id } })
+      }
+    >
       <Image source={{ uri: item.image }} style={styles.productImage} />
       <View style={styles.productInfo}>
         <Text style={styles.productName}>{item.name}</Text>

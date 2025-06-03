@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Heart } from 'lucide-react-native';
+import { router } from 'expo-router';
 
 // FIREBASE
 import { collection, getDocs } from 'firebase/firestore';
@@ -58,7 +59,12 @@ export default function Home() {
   };
 
   const renderProduct = ({ item }) => (
-    <View style={styles.productCard}>
+    <TouchableOpacity
+      style={styles.productCard}
+      onPress={() =>
+        router.push({ pathname: '/product/[id]', params: { id: item.id } })
+      }
+    >
       <Image source={{ uri: item.imageUrl }} style={styles.productImage} />
       <TouchableOpacity
         style={styles.favoriteButton}
@@ -74,7 +80,7 @@ export default function Home() {
         <Text style={styles.productName}>{item.name}</Text>
         <Text style={styles.productPrice}>${item.price}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
